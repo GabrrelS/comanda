@@ -4,6 +4,10 @@ from streamlit_extras.metric_cards import style_metric_cards
 
 API_URL="https://sistema-comanda.onrender.com"
 
+if not st.session_state.get("logado"):
+    st.warning("Faça login")
+    st.stop()
+
 st.title("📊 Dashboard")
 
 try:

@@ -45,9 +45,9 @@ if not st.session_state.logado:
 
             dados=resposta.json()
 
-            st.session_state.logado=True
-
-            st.session_state.tipo=dados["tipo"]
+            st.session_state.logado = True
+            st.session_state.tipo = dados["tipo"]
+            st.session_state.token = dados["access_token"]
 
             st.rerun()
 
@@ -106,27 +106,27 @@ else:
     if pagina=="Dashboard":
 
         exec(open(
-            "telas/dashboard.py",
+            "pages/dashboard.py",
             encoding="utf8"
         ).read())
 
     elif pagina=="Produtos":
 
         exec(open(
-            "telas/produtos.py",
+            "pages/produtos.py",
             encoding="utf8"
         ).read())
 
     elif pagina=="Comandas":
 
         exec(open(
-            "telas/comandas.py",
+            "pages/comandas.py",
             encoding="utf8"
         ).read())
 
     elif pagina=="Relatórios":
 
         exec(open(
-            "telas/relatorios.py",
+            "pages/relatorios.py",
             encoding="utf8"
         ).read())
