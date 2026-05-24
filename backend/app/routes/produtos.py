@@ -38,7 +38,7 @@ def listar_produtos(
         Produto
     ).all()
 
-@router.delete("/produtos/{id}")
+@router.delete("/{id}")
 def excluir_produto(
     id:int,
     db:Session=Depends(get_db)
