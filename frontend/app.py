@@ -7,12 +7,12 @@ API_URL = "https://sistema-comanda.onrender.com"
 st.set_page_config(page_title="Sistema de Comandas", layout="wide")
 
 # 2. Inicialização do Estado
-#if "logado" not in st.session_state:
- #   st.session_state.logado = False
-#if "tipo" not in st.session_state:
- #   st.session_state.tipo = None
-#if "token" not in st.session_state:
- #   st.session_state.token = None
+if "logado" not in st.session_state:
+   st.session_state.logado = False
+if "tipo" not in st.session_state:
+   st.session_state.tipo = None
+if "token" not in st.session_state:
+   st.session_state.token = None
 
 # --- FUNÇÃO DE LOGIN ---
 def login_page():
