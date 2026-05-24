@@ -10,17 +10,35 @@ router = APIRouter(
     tags=["Usuários"]
 )
 
-# Criar usuário
+TIPOS_VALIDOS = [
+    "admin",
+    "operador",
+    "garcom",
+    "caixa"
+]
+
+
+# ==========================
+# CRIAR USUÁRIO
+# ==========================
+
 @router.post("")
 def criar_usuario(
-    dados:dict,
-    db:Session=Depends(get_db)
+    dados: dict,
+    db: Session = Depends(get_db)
 ):
 
-    existe=db.query(
+    if dados["tipo"] not in TIPOS_VALIDOS:
+
+        raise HTTPException(
+            status_code=400,
+            detail=f"Tipos permitidos: {TIPOS_VALIDOS}"
+        )
+
+    existe = db.query(
         Usuario
     ).filter(
-        Usuario.email==dados["email"]
+        Usuario.email == dados["email"]
     ).first()
 
     if existe:
@@ -30,7 +48,7 @@ def criar_usuario(
             detail="Email já cadastrado"
         )
 
-    novo=Usuario(
+    novo = Usuario(
         nome=dados["nome"],
         email=dados["email"],
         senha=gerar_hash(
@@ -43,50 +61,56 @@ def criar_usuario(
     db.commit()
     db.refresh(novo)
 
-    return{
-
-        "id":novo.id,
-        "nome":novo.nome,
-        "tipo":novo.tipo
+    return {
+        "id": novo.id,
+        "nome": novo.nome,
+        "email": novo.email,
+        "tipo": novo.tipo
     }
 
 
-# Listar usuários
+# ==========================
+# LISTAR USUÁRIOS
+# ==========================
+
 @router.get("")
 def listar_usuarios(
-    db:Session=Depends(get_db)
+    db: Session = Depends(get_db)
 ):
 
-    usuarios=db.query(
+    usuarios = db.query(
         Usuario
     ).all()
 
-    resultado=[]
+    resultado = []
 
     for u in usuarios:
 
         resultado.append({
 
-            "id":u.id,
-            "nome":u.nome,
-            "email":u.email,
-            "tipo":u.tipo
+            "id": u.id,
+            "nome": u.nome,
+            "email": u.email,
+            "tipo": u.tipo
         })
 
     return resultado
 
 
-# Buscar usuário por ID
+# ==========================
+# BUSCAR POR ID
+# ==========================
+
 @router.get("/{id}")
 def buscar_usuario(
-    id:int,
-    db:Session=Depends(get_db)
+    id: int,
+    db: Session = Depends(get_db)
 ):
 
-    usuario=db.query(
+    usuario = db.query(
         Usuario
     ).filter(
-        Usuario.id==id
+        Usuario.id == id
     ).first()
 
     if not usuario:
@@ -96,26 +120,29 @@ def buscar_usuario(
             detail="Usuário não encontrado"
         )
 
-    return{
+    return {
 
-        "id":usuario.id,
-        "nome":usuario.nome,
-        "email":usuario.email,
-        "tipo":usuario.tipo
+        "id": usuario.id,
+        "nome": usuario.nome,
+        "email": usuario.email,
+        "tipo": usuario.tipo
     }
 
 
-# Excluir usuário
+# ==========================
+# EXCLUIR
+# ==========================
+
 @router.delete("/{id}")
 def excluir_usuario(
-    id:int,
-    db:Session=Depends(get_db)
+    id: int,
+    db: Session = Depends(get_db)
 ):
 
-    usuario=db.query(
+    usuario = db.query(
         Usuario
     ).filter(
-        Usuario.id==id
+        Usuario.id == id
     ).first()
 
     if not usuario:
@@ -128,6 +155,6 @@ def excluir_usuario(
     db.delete(usuario)
     db.commit()
 
-    return{
-        "mensagem":"Usuário removido"
+    return {
+        "mensagem": "Usuário removido"
     }

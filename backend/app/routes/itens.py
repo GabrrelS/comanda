@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import ItemComanda, Produto, Comanda
+from app.permissoes import admin_ou_garcom
 
 router = APIRouter(
     prefix="/itens",
@@ -13,7 +14,8 @@ router = APIRouter(
 @router.post("")
 def adicionar_item(
     dados: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario=Depends(admin_ou_garcom)
 ):
 
     produto = db.query(
@@ -29,6 +31,7 @@ def adicionar_item(
             detail="Produto não encontrado"
         )
 
+
     comanda = db.query(
         Comanda
     ).filter(
@@ -42,30 +45,92 @@ def adicionar_item(
             detail="Comanda não encontrada"
         )
 
-    item = ItemComanda(
+
+    if comanda.status=="FINALIZADA":
+
+        raise HTTPException(
+            status_code=400,
+            detail="Comanda já fechada"
+        )
+
+
+    quantidade=dados["quantidade"]
+
+
+    if produto.estoque<quantidade:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Estoque insuficiente"
+        )
+
+
+    produto.estoque-=quantidade
+
+
+    item=ItemComanda(
+
         produto_id=dados["produto_id"],
+
         comanda_id=dados["comanda_id"],
-        quantidade=dados["quantidade"]
+
+        quantidade=quantidade,
+
+        preco_unitario=produto.preco
     )
 
-    comanda.total += (
-        produto.preco *
-        dados["quantidade"]
+
+    comanda.total+=(
+        item.preco_unitario*
+        quantidade
     )
+
 
     db.add(item)
+
     db.commit()
 
-    return {
-        "mensagem": "Item adicionado"
+    db.refresh(item)
+
+    return{
+
+        "mensagem":"Item adicionado",
+
+        "preco_vendido":
+        item.preco_unitario,
+
+        "estoque_restante":
+        produto.estoque
     }
 
 
 @router.get("")
 def listar_itens(
-    db: Session = Depends(get_db)
+    db:Session=Depends(get_db)
 ):
 
-    return db.query(
+    itens=db.query(
         ItemComanda
     ).all()
+
+    resultado=[]
+
+    for i in itens:
+
+        resultado.append({
+
+            "id":i.id,
+
+            "produto":i.produto.nome,
+
+            "quantidade":i.quantidade,
+
+            "preco_unitario":
+            i.preco_unitario,
+
+            "subtotal":
+            i.preco_unitario*
+            i.quantidade
+        })
+
+    return resultado

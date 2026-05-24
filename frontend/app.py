@@ -117,40 +117,44 @@ else:
         "🍴 Sistema"
     )
 
-    menu = []
+    menu=[]
 
-    if st.session_state.tipo == "Admin":
+    # ADMIN
+    if st.session_state.tipo=="admin":
 
-        menu = [
+        menu=[
             "Dashboard",
             "Produtos",
             "Comandas",
             "Relatórios"
         ]
 
-    elif st.session_state.tipo == "Operador":
+    # GARÇOM / OPERADOR
+    elif st.session_state.tipo=="operador":
 
-        menu = [
-            "Dashboard",
+        menu=[
             "Comandas"
         ]
 
-    elif st.session_state.tipo == "Sistema":
+    # CAIXA
+    elif st.session_state.tipo=="caixa":
 
-        menu = [
+        menu=[
             "Comandas",
             "Relatórios"
         ]
 
-    pagina = st.sidebar.radio(
+    pagina=st.sidebar.radio(
         "Menu",
         menu
     )
 
-    if st.sidebar.button("Sair"):
+    if st.sidebar.button(
+        "Sair"
+    ):
 
-        st.session_state.logado = False
-        st.session_state.tipo = None
+        st.session_state.logado=False
+        st.session_state.tipo=None
 
         st.rerun()
 

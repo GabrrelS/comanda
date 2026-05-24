@@ -6,6 +6,11 @@ API_URL = "https://sistemas-comandas-aps.onrender.com"
 
 st.title("🍽️ Comandas")
 
+tipo_usuario = st.session_state.get(
+    "tipo",
+    ""
+)
+
 # ==========================
 # CARREGAR COMANDAS
 # ==========================
@@ -25,6 +30,20 @@ try:
 except:
 
     comandas=[]
+
+
+# ==========================
+# FILTRAR COMANDAS
+# ==========================
+
+if tipo_usuario!="admin":
+
+    comandas=[
+
+        c for c in comandas
+        if c["status"]!="FINALIZADA"
+
+    ]
 
 
 # ==========================
@@ -75,7 +94,7 @@ Total: R$ {c["total"]:.2f}
 """
             )
 
-            if c["status"] != "FINALIZADA":
+            if c["status"]!="FINALIZADA":
 
                 if st.button(
                     f"Fechar mesa {c['mesa']}",

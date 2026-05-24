@@ -93,7 +93,7 @@ class Comanda(Base):
 
     status = Column(
         String,
-        default="Aberta"
+        default="ABERTA"
     )
 
     total = Column(
@@ -108,8 +108,7 @@ class Comanda(Base):
 
     itens = relationship(
         "ItemComanda",
-        back_populates="comanda",
-        cascade="all, delete"
+        back_populates="comanda"
     )
 
 
@@ -135,6 +134,12 @@ class ItemComanda(Base):
 
     quantidade = Column(
         Integer,
+        nullable=False
+    )
+
+    # PREÇO SALVO NO MOMENTO DA VENDA
+    preco_unitario = Column(
+        Float,
         nullable=False
     )
 

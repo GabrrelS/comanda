@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
-from streamlit_extras.metric_cards import style_metric_cards
 
-API_URL="https://sistemas-comandas-aps.onrender.com"
+API_URL = "https://sistemas-comandas-aps.onrender.com"
 
 st.title("📊 Dashboard")
 
@@ -22,7 +21,6 @@ try:
 
     comandas = resposta.json()
 
-    # garante que é uma lista
     if not isinstance(
         comandas,
         list
@@ -38,89 +36,94 @@ try:
 
         st.stop()
 
-    abertas=0
-    cozinha=0
-    finalizadas=0
-    faturamento=0
+    abertas = 0
+    finalizadas = 0
+    faturamento = 0
 
     for c in comandas:
 
-        status=c.get(
+        status = c.get(
             "status",
             ""
         )
 
-        if status=="ABERTA":
+        if status == "ABERTA":
 
-            abertas+=1
+            abertas += 1
 
-        elif status=="NA_COZINHA":
+        elif status == "FINALIZADA":
 
-            cozinha+=1
+            finalizadas += 1
 
-        elif status=="FINALIZADA":
-
-            finalizadas+=1
-
-            faturamento+=float(
-
+            faturamento += float(
                 c.get(
                     "total",
                     0
                 )
             )
 
-    col1,col2,col3,col4=st.columns(4)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
 
         st.metric(
-            "Comandas abertas",
-            abertas
+            label="Comandas abertas",
+            value=abertas
         )
 
     with col2:
 
         st.metric(
-            "Na cozinha",
-            cozinha
+            label="Finalizadas",
+            value=finalizadas
         )
 
     with col3:
 
         st.metric(
-            "Finalizadas",
-            finalizadas
+            label="Faturamento",
+            value=f"R$ {faturamento:.2f}"
         )
 
-    with col4:
-
-        st.metric(
-            "Faturamento",
-            f"R$ {faturamento:.2f}"
-        )
 
     st.markdown("""
+
     <style>
 
-    [data-testid="stMetric"]{
-    background-color: #1e1e1e;
-    border: 1px solid #333333;
-    padding: 15px;
-    border-radius: 12px;
+    /* CARD */
+
+    div[data-testid="stMetric"]{
+
+        background:#161b22;
+        border:1px solid #30363d;
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+
     }
 
-    [data-testid="stMetricLabel"]{
-    color:white;
-    font-size:16px;
+    /* TÍTULO */
+
+    div[data-testid="stMetricLabel"]{
+
+        color:white !important;
+        font-size:16px !important;
+        font-weight:bold;
+
     }
 
-    [data-testid="stMetricValue"]{
-    color:#a855f7;
-    font-size:30px;
+    /* VALOR */
+
+    div[data-testid="stMetricValue"]{
+
+        color:#a855f7 !important;
+        font-size:35px !important;
+        font-weight:bold;
+
     }
 
     </style>
+
     """, unsafe_allow_html=True)
 
 except Exception as e:

@@ -3,16 +3,16 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Comanda
+from app.permissoes import (
+    admin_ou_garcom,
+    admin_ou_caixa
+)
 
 router = APIRouter(
     prefix="/comandas",
     tags=["Comandas"]
 )
 
-
-# ==========================
-# LISTAR COMANDAS
-# ==========================
 
 @router.get("")
 def listar_comandas(
@@ -23,14 +23,11 @@ def listar_comandas(
     ).all()
 
 
-# ==========================
-# CRIAR COMANDA
-# ==========================
-
 @router.post("")
 def criar_comanda(
     dados: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario=Depends(admin_ou_garcom)
 ):
 
     nova = Comanda(
@@ -46,20 +43,17 @@ def criar_comanda(
     return nova
 
 
-# ==========================
-# FECHAR COMANDA
-# ==========================
-
 @router.put("/{comanda_id}/fechar")
 def fechar_comanda(
-    comanda_id: int,
-    db: Session = Depends(get_db)
+    comanda_id:int,
+    db:Session=Depends(get_db),
+    usuario=Depends(admin_ou_caixa)
 ):
 
-    comanda = db.query(
+    comanda=db.query(
         Comanda
     ).filter(
-        Comanda.id == comanda_id
+        Comanda.id==comanda_id
     ).first()
 
     if not comanda:
@@ -69,20 +63,10 @@ def fechar_comanda(
             detail="Comanda não encontrada"
         )
 
-    if comanda.status == "FINALIZADA":
-
-        raise HTTPException(
-            status_code=400,
-            detail="Comanda já está fechada"
-        )
-
-    comanda.status = "FINALIZADA"
+    comanda.status="FINALIZADA"
 
     db.commit()
-    db.refresh(comanda)
 
-    return {
-        "mensagem": "Comanda fechada com sucesso",
-        "comanda": comanda.id,
-        "status": comanda.status
+    return{
+        "mensagem":"Comanda fechada"
     }
