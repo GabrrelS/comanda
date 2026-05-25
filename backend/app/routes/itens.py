@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,13 +6,15 @@ from app.database import get_db
 from app.models import ItemComanda, Produto, Comanda
 from app.permissoes import admin_ou_garcom
 
+print(">>> ITENS ROUTER IMPORTADO")
+
 router = APIRouter(
     prefix="/itens",
     tags=["Itens"]
 )
 
 
-@router.post("")
+@router.post("/")
 def adicionar_item(
     dados: dict,
     db: Session = Depends(get_db),
@@ -104,7 +107,7 @@ def adicionar_item(
     }
 
 
-@router.get("")
+@router.get("/")
 def listar_itens(
     db:Session=Depends(get_db)
 ):

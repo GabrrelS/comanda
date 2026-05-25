@@ -1,7 +1,5 @@
-from .conftest import client
-
-
-def test_criar_comanda():
+def test_criar_comanda(client):
+    
     response = client.post(
         "/comandas",
         json={

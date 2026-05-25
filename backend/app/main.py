@@ -2,12 +2,16 @@ from fastapi import FastAPI
 from app.database import engine
 from app.models import Base
 
-from app.routes import produtos
-from app.routes import relatorios
-from app.routes import auth_routes
-from app.routes import users
-from app.routes import comandas
-from app.routes import itens
+print(">>> MAIN PY CARREGADO")
+
+from app.routes import (
+    produtos,
+    relatorios,
+    auth_routes,
+    users,
+    comandas,
+    itens
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +29,10 @@ app.include_router(itens.router)
 @app.get("/")
 def home():
     return {
-        "status":"online",
-        "mensagem":"API Sistema de Comandas funcionando"
+        "status": "online",
+        "mensagem": "API Sistema de Comandas funcionando"
     }
+
+print("ROTAS REGISTRADAS:")
+for r in app.routes:
+    print(r.path)
